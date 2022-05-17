@@ -2,7 +2,6 @@
   "name": "githubsearch",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "*": {
     "target": "http://github.com"
   },
@@ -25,6 +24,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx}\" --quiet"

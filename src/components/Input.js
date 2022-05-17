@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-
+import Button from "@mui/material/Button";
 // eslint-disable-next-line react/prop-types
 const Input = ({ handleInput }) => {
   const input = useRef(null);
@@ -12,8 +12,24 @@ const Input = ({ handleInput }) => {
 
   return (
     <form style={{ marginLeft: "30px" }} onSubmit={submit}>
-      <input style={{ height: "25px" }} ref={input} type="text" />
-      <input style={{ marginLeft: "10px", height: "25px" }} type="submit" />
+      <input
+        placeholder="Enter search keyword"
+        style={{ height: "25px" }}
+        ref={input}
+        type="text"
+      />
+      <Button
+        variant="outline"
+        style={{
+          color: "black",
+          background: "white",
+          marginLeft: "10px",
+          height: "25px",
+        }}
+        type="submit"
+      >
+        Submit
+      </Button>
     </form>
   );
 };

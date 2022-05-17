@@ -9,30 +9,42 @@ import repo from "../api/responseHandler";
  * Card - this returns either a mainCard or both a mainCard && reviewCard
  */
 // eslint-disable-next-line react/prop-types
-const Card = ({ obj, type, errorMsg, error, setError }) => {
+const Card = ({ obj, type }) => {
   const items = repo(obj, type);
-  console.log("-----", items);
-  if (items instanceof Error) {
-    console.log("dang--------");
-    setError(true);
-  } else {
-    if (error) setError(false);
-  }
+
+  const format = (item) => {
+    const regex = /http/g;
+    if (item) {
+      return new String(item).search(regex) === 0 ? (
+        <a rel="noreferrer" target="_blank" href={item}>
+          {item}
+        </a>
+      ) : (
+        item
+      );
+    }
+  };
 
   const face = () =>
     items ? (
       <div>
-        <Typography style={{ fontWeight: "bold" }}>{items.a}</Typography>
-        <Typography>{items.b}</Typography>
+        <Typography style={{ fontWeight: "bold" }}>
+          {format(items.a)}
+        </Typography>
+        <Typography>{format(items.b)}</Typography>
         <div style={{ display: "flex" }}>
-          <Typography style={{ marginRight: "30px" }}>{items.c}</Typography>
-          <Typography style={{ marginRight: "30px" }}>{items.d}</Typography>
+          <Typography style={{ marginRight: "30px" }}>
+            {format(items.c)}
+          </Typography>
+          <Typography style={{ marginRight: "30px" }}>
+            {format(items.d)}
+          </Typography>
 
-          <Typography>{items.e}</Typography>
+          <Typography>{format(items.e)}</Typography>
         </div>
       </div>
     ) : (
-      setError(true)
+      ""
     );
 
   return (

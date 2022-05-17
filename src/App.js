@@ -1,9 +1,12 @@
 import React from "react";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import Layout from "./pages/Layout";
+
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
 
 const App = () => {
   return <Layout />;
 };
 
-render(React.createElement(App), document.getElementById("root"));
+root.render(<App />);

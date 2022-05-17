@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Input from "../components/Input";
-import Card from "../components/Card";
+
 import Toolbar from "../components/Toolbar";
 import Pagination from "../components/Pagination";
 import search from "../api/api.js";
@@ -8,7 +8,8 @@ import Grid from "@mui/material/Grid";
 import Selectors from "../components/Selectors";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import Notification from '../components/Notification'
+import Notification from "../components/Notification";
+import Results, { isDataReady } from "../components/Results";
 
 const types = ["repositories", "commits", "issues", "topics", "users"];
 
@@ -19,7 +20,8 @@ const Layout = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
+  const [count, setCount] = useState(false);
+  const internationalNumberFormat = new Intl.NumberFormat("en-US");
   // from toolbar - query
   const handleInput = (inputData, page) => {
     setQuery(inputData);
@@ -43,23 +45,21 @@ const Layout = () => {
     setLoading(true);
     try {
       const response = await search(inputData, page, type);
-      const { items } = response;
+      const { items, total_count } = response;
+
       setLoading(false);
       setData(items);
-      
+
+      const count = internationalNumberFormat.format(total_count);
+      setCount(count);
     } catch (err) {
+      // error from api call
       setLoading(false);
-  
-      console.log("error", err);
-      setData(err);
+
+      console.log("error from api call", err);
+      // setData(err);
       setError(true);
     }
-  };
-
-  const cardStyle = {
-    display: "flex",
-    flexDirection: "column",
-    marginBottom: "60px",
   };
 
   const boxStyle = {
@@ -69,17 +69,13 @@ const Layout = () => {
     alignItems: "center",
   };
 
-  const errorMsg = (message = '') => {
-    return (
-      <Notification message={message} error={error} setError={setError} />
-    );
+  const errorMsg = (message = "") => {
+    return <Notification message={message} error={error} setError={setError} />;
   };
-
-  const dataCheck = (data) => data !== null || data !==undefined;
 
   return (
     <div>
-      <Toolbar>
+      <Toolbar count={count}>
         <Input handleInput={handleInput} />
       </Toolbar>
 
@@ -91,32 +87,23 @@ const Layout = () => {
             types={types}
           />
         </Grid>
-
-        {!loading ? (
-          <Grid item md={9}>
-            {dataCheck(data) ? (
-              <div style={cardStyle}>
-                {data.map((obj, i) => (
-                  <Card key={obj.node_id ?? i} setError={setError}errorMsg={errorMsg} error={error} obj={obj} type={type} />
-                ))}
-              </div>
-            ) : (
-              ""
-            )}
-          </Grid>
-        ) : (
-          <Box sx={boxStyle}>
-            <CircularProgress />
-          </Box>
-        )}
+        <Grid item md={9}>
+          {!loading ? (
+            <Results data={data} type={type} />
+          ) : (
+            <Box sx={boxStyle}>
+              <CircularProgress />
+            </Box>
+          )}
+        </Grid>
       </Grid>
 
-      {dataCheck(data) ? (
+      {isDataReady(data) ? (
         <Pagination page={page} handlePageChange={handlePageChange} />
       ) : (
         ""
       )}
-      {error ? errorMsg('server issues - try again later') : ""}
+      {error ? errorMsg("server issues - refresh & try again later") : ""}
     </div>
   );
 };

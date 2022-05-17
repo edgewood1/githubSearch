@@ -14,32 +14,20 @@ const repo = (obj, type) => {
       users: () => users(obj),
     }[type]();
   } catch (err) {
-    return err;
+    console.log("repo function error", err);
+    return {};
   }
 };
 
 export default repo;
 
-const errorCheck = (obj) => {
-  console.log("error", obj);
-  // return obj;
-  throw new Error("Request Issue: select another type");
-  // return obj;
-  // if (Object.keys(obj).includes("message")) {
-  //   return { a: obj.message };
-  // } else {
-  //   return {};
-  // }
-};
-
 const commit = (obj) => {
-  console.log("commits", obj);
   if (Object.keys(obj).includes("commit")) {
     const {
       commit: {
         author: { name, date },
+        message,
       },
-      message,
       url,
     } = obj;
     return {
@@ -49,12 +37,11 @@ const commit = (obj) => {
       d: new Date(date).toLocaleDateString("en-US"),
     };
   } else {
-    return errorCheck(obj);
+    return {};
   }
 };
 
 const issues = (obj) => {
-  console.log("issues", obj);
   if (Object.keys(obj).includes("user")) {
     const {
       html_url,
@@ -71,30 +58,34 @@ const issues = (obj) => {
       e: new Date(updated_at).toLocaleDateString("en-US"),
     };
   } else {
-    return errorCheck(obj);
+    return {};
   }
 };
 
 const topics = (obj) => {
-  console.log("topics", obj);
-  if (Object.keys(obj).includes("created_by")) {
+  const keys = Object.keys(obj);
+
+  if (keys.includes("name")) {
     return {
-      a: obj.created_by,
-      b: obj.short_description,
-      c: obj.display_name,
+      a: obj.name,
+      b: obj.description,
+      c: obj.html_url,
       d: new Date(obj.updated_at).toLocaleDateString("en-US"),
     };
+  } else if (keys.includes("login")) {
+    return {
+      a: obj.login,
+      b: obj.html_url,
+    };
   } else {
-    console.log(Object.keys(obj));
-    return errorCheck(obj);
+    return {};
   }
 };
 
 const users = (obj) => {
-  console.log("users", obj);
   if (Object.keys(obj).includes("login")) {
     return { a: obj.login, b: obj.url };
   } else {
-    return errorCheck(obj);
+    return {};
   }
 };
