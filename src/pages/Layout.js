@@ -36,7 +36,7 @@ const Layout = () => {
 
   // from typeSelector = type
   const handleTypeSelector = (event, value) => {
-    console.log("value", value);
+    
     setType(value);
     if (query.length > 0) apiCall(query, page, value);
   };
@@ -46,18 +46,12 @@ const Layout = () => {
     try {
       const response = await search(inputData, page, type);
       const { items, total_count } = response;
-
       setLoading(false);
       setData(items);
-
       const count = internationalNumberFormat.format(total_count);
       setCount(count);
     } catch (err) {
-      // error from api call
       setLoading(false);
-
-      console.log("error from api call", err);
-      // setData(err);
       setError(true);
     }
   };
