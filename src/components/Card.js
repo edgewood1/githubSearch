@@ -9,8 +9,8 @@ import repo from "../api/responseHandler";
  * Card - this returns either a mainCard or both a mainCard && reviewCard
  */
 // eslint-disable-next-line react/prop-types
-const Card = ({ obj, type }) => {
-  const items = repo(obj, type);
+const Card = ({ obj, type, setError }) => {
+  const items = repo(obj, type, setError);
 
   const format = (item) => {
     const regex = /http/g;

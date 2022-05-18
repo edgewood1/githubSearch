@@ -1,4 +1,5 @@
-const repo = (obj, type) => {
+const repo = (obj, type, setError) => {
+  console.log(obj, type);
   try {
     return {
       repositories: () => ({
@@ -15,6 +16,7 @@ const repo = (obj, type) => {
     }[type]();
   } catch (err) {
     console.log("repo function error", err);
+    setError(true);
     return {};
   }
 };
@@ -22,7 +24,7 @@ const repo = (obj, type) => {
 export default repo;
 
 const commit = (obj) => {
-  if (Object.keys(obj).includes("commit")) {
+  try {
     const {
       commit: {
         author: { name, date },
@@ -30,19 +32,19 @@ const commit = (obj) => {
       },
       url,
     } = obj;
-    return {
-      a: name,
-      b: message,
-      c: url,
-      d: new Date(date).toLocaleDateString("en-US"),
-    };
-  } else {
-    return {};
+    return reducer([
+      name,
+      message,
+      url,
+      new Date(date).toLocaleDateString("en-US"),
+    ]);
+  } catch (err) {
+    throw Error(err);
   }
 };
 
 const issues = (obj) => {
-  if (Object.keys(obj).includes("user")) {
+  try {
     const {
       html_url,
       user: { login },
@@ -50,42 +52,47 @@ const issues = (obj) => {
       body,
       updated_at,
     } = obj;
-    return {
-      a: login,
-      b: html_url,
-      c: title,
-      d: body,
-      e: new Date(updated_at).toLocaleDateString("en-US"),
-    };
-  } else {
-    return {};
+    return reducer([
+      login,
+      html_url,
+      title,
+      body,
+      new Date(updated_at).toLocaleDateString("en-US"),
+    ]);
+  } catch (err) {
+    throw Error(err);
   }
 };
 
 const topics = (obj) => {
-  const keys = Object.keys(obj);
-
-  if (keys.includes("name")) {
-    return {
-      a: obj.name,
-      b: obj.description,
-      c: obj.html_url,
-      d: new Date(obj.updated_at).toLocaleDateString("en-US"),
-    };
-  } else if (keys.includes("login")) {
-    return {
-      a: obj.login,
-      b: obj.html_url,
-    };
-  } else {
-    return {};
+  const { name, description, html_url, updated_at } = obj;
+  try {
+    return reducer([
+      name,
+      description,
+      html_url,
+      new Date(updated_at).toLocaleDateString("en-US"),
+    ]);
+  } catch (err) {
+    throw Error(err);
   }
 };
 
 const users = (obj) => {
-  if (Object.keys(obj).includes("login")) {
+  try {
     return { a: obj.login, b: obj.url };
-  } else {
-    return {};
+  } catch (err) {
+    throw Error(err);
   }
+};
+
+const reducer = (arr) => {
+  const keys = ["a", "b", "c", "d", "e"];
+  const newObj = arr.reduce((acc, item, index) => {
+    let obj = {};
+    obj[keys[index]] = item;
+    acc = { ...acc, ...obj };
+    return acc;
+  }, {});
+  return newObj;
 };

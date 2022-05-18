@@ -13,7 +13,7 @@ export default function ButtonAppBar({ children, count }) {
           style={{ position: "stick", display: "flex", textAlign: "center" }}
         >
           {children}
-          {count ? (
+          {!isNaN(count) ? (
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Total count: {count}
             </Typography>

@@ -3,7 +3,7 @@ import Input from "../components/Input";
 
 import Toolbar from "../components/Toolbar";
 import Pagination from "../components/Pagination";
-import search from "../api/api.js";
+import search from "../api";
 import Grid from "@mui/material/Grid";
 import Selectors from "../components/Selectors";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -14,57 +14,35 @@ import Results, { isDataReady } from "../components/Results";
 const types = ["repositories", "commits", "issues", "topics", "users"];
 
 const Layout = () => {
-  const [data, setData] = useState([]);
   const [query, setQuery] = useState("");
   const [type, setType] = useState(types[0]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [count, setCount] = useState(false);
-  const internationalNumberFormat = new Intl.NumberFormat("en-US");
+
+  let data, error, errorMsg, loading, count, setError;
+  ({ data, error, errorMsg, loading, count, setError } = search(
+    query,
+    page,
+    type
+  ));
+
   // from toolbar - query
-  const handleInput = (inputData, page) => {
+  const handleInput = (inputData) => {
     setQuery(inputData);
-    apiCall(inputData, page, type);
   };
 
   // from paginator - page
   const handlePageChange = (event, value) => {
     setPage(value);
-    apiCall(query, page, type);
   };
 
   // from typeSelector = type
   const handleTypeSelector = (event, value) => {
-    
     setType(value);
-    if (query.length > 0) apiCall(query, page, value);
-  };
-
-  const apiCall = async (inputData, page, type) => {
-    setLoading(true);
-    try {
-      const response = await search(inputData, page, type);
-      const { items, total_count } = response;
-      setLoading(false);
-      setData(items);
-      const count = internationalNumberFormat.format(total_count);
-      setCount(count);
-    } catch (err) {
-      setLoading(false);
-      setError(true);
-    }
   };
 
   const boxStyle = {
-    width: "100vw",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  };
-
-  const errorMsg = (message = "") => {
-    return <Notification message={message} error={error} setError={setError} />;
+    paddingTop: "40vh",
+    paddingLeft: "25vw",
   };
 
   return (
@@ -72,7 +50,6 @@ const Layout = () => {
       <Toolbar count={count}>
         <Input handleInput={handleInput} />
       </Toolbar>
-
       <Grid container spacing={2}>
         <Grid item md={3}>
           <Selectors
@@ -83,7 +60,7 @@ const Layout = () => {
         </Grid>
         <Grid item md={9}>
           {!loading ? (
-            <Results data={data} type={type} />
+            <Results data={data} type={type} setError={setError} />
           ) : (
             <Box sx={boxStyle}>
               <CircularProgress />
@@ -91,13 +68,17 @@ const Layout = () => {
           )}
         </Grid>
       </Grid>
-
+      )
       {isDataReady(data) ? (
         <Pagination page={page} handlePageChange={handlePageChange} />
       ) : (
         ""
       )}
-      {error ? errorMsg("server issues - refresh & try again later") : ""}
+      {error ? (
+        <Notification message={errorMsg} error={error} setError={setError} />
+      ) : (
+        ""
+      )}
     </div>
   );
 };
